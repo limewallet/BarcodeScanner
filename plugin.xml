@@ -22,17 +22,23 @@
              </feature>
         </config-file>
 
-		<resource-file src="src/ios/scannerOverlay.xib" />
+		<resource-file src="src/ios/beep-beep.aiff" />
 
-        <header-file src="src/ios/zxing-all-in-one.h" />
+		<header-file src="src/ios/CDVBarcodeScanner.h"/>
+        <source-file src="src/ios/CDVBarcodeScanner.mm"/>
 
-        <source-file src="src/ios/CDVBarcodeScanner.mm" compiler-flags="-fno-objc-arc" />
-        <source-file src="src/ios/zxing-all-in-one.cpp" />
+        <header-file src="src/ios/ZXingWidgetController.h"/>
+        <resource-file src="src/ios/empty.cpp"/>
+        <source-file src="src/ios/libZXingWidgetLibrary.a" framework="true" compiler-flags="-fno-objc-arc"/>
 
+		<framework src="libz.dylib" />
+        <framework src="libc++.dylib" />
         <framework src="libiconv.dylib" />
         <framework src="AVFoundation.framework" />
         <framework src="AssetsLibrary.framework" />
         <framework src="CoreVideo.framework" />
+        <framework src="CoreGraphics.framework" />
+        <framework src="AudioToolbox.framework" />
 
         <js-module src="www/barcodescanner.js" name="barcodescanner">
 	        <clobbers target="plugins.barcodeScanner" />
