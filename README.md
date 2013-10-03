@@ -8,9 +8,14 @@ Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob
 This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html). 
 
 Note: the Android source for this project includes an Android Library Project.
-plugman currently doesn't support Library Project refs, so its been
+_plugman_ currently doesn't support Library Project refs, so its been
 prebuilt as a jar library. Any updates to the Library Project should be
 committed with an updated jar.
+
+Note: the iOS source for this project includes a XCode Universal Static Library Project.
+_plugman_ currently doesn't support Library Project refs, so its been
+prebuilt as a fat library. Any updates to the Static Library Project should be
+committed with an updated library file (.a).
 
 Note: the WP8 source does not include the ZXing.Net library, so it has to
 be included during installation.
