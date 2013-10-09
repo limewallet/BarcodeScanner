@@ -160,6 +160,16 @@ namespace barcodescanner
 
         private void OnButtonHalfPress(object sender, EventArgs e)
         {
+            this.makeFocus();
+        }
+
+        private void _focusButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.makeFocus();
+        }
+
+        private void makeFocus()
+        {
             if (_photoCamera != null && _photoCamera.IsFocusSupported)
             {
                 try
@@ -168,9 +178,9 @@ namespace barcodescanner
                 }
                 catch
                 {
-                    
+
                 }
             }
-        } 
+        }
     }
 }
