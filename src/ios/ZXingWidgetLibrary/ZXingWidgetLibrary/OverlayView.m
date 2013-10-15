@@ -55,7 +55,7 @@ static const int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
         
         toolbar = [[UIToolbar alloc] init];
         toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleTopMargin;
-        toolbar.barStyle = UIBarStyleDefault;
+        toolbar.barStyle = UIBarStyleBlackTranslucent;
         toolbar.translucent = YES;
         
         NSMutableArray *items = [NSMutableArray arrayWithCapacity: 1];

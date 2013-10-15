@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -25,8 +26,16 @@ namespace barcodescanner
 {
     public partial class Scanner : PhoneApplicationPage
     {
+
+        private const string VisibilityGroupName = "VisibilityStates";
+        private const string OpenVisibilityStateName = "Open";
+        private const string ClosedVisibilityStateName = "Closed";
+        private const string StateKey_Value = "ScannerPageBase_State_Value";
+
+        private Storyboard _closedStoryboard;
+
         /// <summary>
-        /// Occurs when a video recording task is completed.
+        /// Occurs when a barcode scan task is completed.
         /// </summary>
         public event EventHandler<ScannerResult> Completed;
 
@@ -41,11 +50,47 @@ namespace barcodescanner
         public Scanner()
         {
             InitializeComponent();
+
+            // Hook up to storyboard(s)
+            FrameworkElement templateRoot = VisualTreeHelper.GetChild(this, 0) as FrameworkElement;
+            if (null != templateRoot)
+            {
+                foreach (VisualStateGroup group in VisualStateManager.GetVisualStateGroups(templateRoot))
+                {
+                    if (VisibilityGroupName == group.Name)
+                    {
+                        foreach (VisualState state in group.States)
+                        {
+                            if ((ClosedVisibilityStateName == state.Name) && (null != state.Storyboard))
+                            {
+                                _closedStoryboard = state.Storyboard;
+                                _closedStoryboard.Completed += OnClosedStoryboardCompleted;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Play the Open state
+            VisualStateManager.GoToState(this, OpenVisibilityStateName, true);
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+
+            // Restore Value if returning to application (to avoid inconsistent state)
+            if (State.ContainsKey(StateKey_Value))
+            {
+
+                // Back out from scan page for consistency with behavior of core pickers in this scenario
+                if (NavigationService.CanGoBack)
+                {
+                    NavigationService.GoBack();
+
+                    return;
+                }
+            }
 
             if (_photoCamera == null){
                 _photoCamera = new PhotoCamera();
@@ -75,6 +120,8 @@ namespace barcodescanner
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
         {
 
+            base.OnNavigatedFrom(e);
+
             if (timer != null)
             {
                 timer.Stop();
@@ -83,12 +130,50 @@ namespace barcodescanner
 
             stopCamera();
 
-            if (this.Completed != null)
+            // Save Value if navigating away from application
+            if ("app://external/" == e.Uri.ToString())
+            {
+                State[StateKey_Value] = true;
+            }
+            else if (this.Completed != null)
             {
                 this.Completed(this, result);
             }
+        }
 
-            base.OnNavigatedFrom(e);
+        /// <summary>
+        /// Called when the Back key is pressed.
+        /// </summary>
+        /// <param name="e">Event arguments.</param>
+        protected override void OnBackKeyPress(CancelEventArgs e)
+        {
+            if (null == e)
+            {
+                throw new ArgumentNullException("e");
+            }
+
+            // Cancel back action so we can play the Close state animation (then go back)
+            e.Cancel = true;
+            CloseScannerPage();
+        }
+
+        private void CloseScannerPage()
+        {
+            // Play the Close state (if available)
+            if (null != _closedStoryboard)
+            {
+                VisualStateManager.GoToState(this, ClosedVisibilityStateName, true);
+            }
+            else
+            {
+                OnClosedStoryboardCompleted(null, null);
+            }
+        }
+
+        private void OnClosedStoryboardCompleted(object sender, EventArgs e)
+        {
+            // Close the scan page
+            NavigationService.GoBack();
         }
 
         private void OnPhotoCameraInitialized(object sender, CameraOperationCompletedEventArgs e)

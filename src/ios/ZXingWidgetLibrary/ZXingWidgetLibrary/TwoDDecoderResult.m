@@ -42,9 +42,9 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    NSArray* newPoints = [[[NSArray alloc] initWithArray:points] autorelease];
-    NSString* newText = [[[NSString alloc] initWithString:text] autorelease];
-    NSString* newFormat = [[[NSString alloc] initWithString:format] autorelease];
+    NSArray* newPoints = [[self.points copy] autorelease];
+    NSString* newText = [[self.text copy] autorelease];
+    NSString* newFormat = [[self.format copy] autorelease];
     
     return [[TwoDDecoderResult allocWithZone:zone] initWithText:newText points:newPoints format: newFormat];
 }

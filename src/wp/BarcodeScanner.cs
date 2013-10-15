@@ -10,38 +10,107 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Tasks;
 using System.Windows;
 using System.Diagnostics;
+using System.Windows.Navigation;
 
 
 namespace Cordova.Extension.Commands
 {
     public class BarcodeScanner : WPCordovaClassLib.Cordova.Commands.BaseCommand
     {
+
+        #region Internal fields
+
+        private PhoneApplicationFrame _frame;
+        private object _frameContentWhenOpened;
+        private barcodescanner.Scanner _scannerPage;
+
+        #endregion
+
+        /// <summary>
+        /// Public method to scan
+        /// </summary>
         public void scan(string options) 
         {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                var root = Application.Current.RootVisual as PhoneApplicationFrame;
 
-                root.Navigated += new System.Windows.Navigation.NavigatedEventHandler(root_Navigated);
+                if (null == _frame)
+                {
+                    // Hook up to necessary events and navigate
+                    _frame = Application.Current.RootVisual as PhoneApplicationFrame;
+                    if (null != _frame)
+                    {
+                        _frameContentWhenOpened = _frame.Content;
 
-                root.Navigate(new System.Uri("/Plugins/com.phonegap.plugins.barcodescanner/Scanner.xaml?dummy=" + Guid.NewGuid().ToString(), UriKind.Relative));
+                        _frame.Navigated += OnFrameNavigated;
+                        _frame.NavigationStopped += OnFrameNavigationStoppedOrFailed;
+                        _frame.NavigationFailed += OnFrameNavigationStoppedOrFailed;
+
+                        _frame.Navigate(new System.Uri("/Plugins/com.phonegap.plugins.barcodescanner/Scanner.xaml?dummy=" + Guid.NewGuid().ToString(), UriKind.Relative));
+                    }
+                }
             });
         }
 
-        void root_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
+        /// <summary>
+        /// Public method to encode: not implemented
+        /// </summary>
+        public void encode(string options)
         {
-            if (!(e.Content is barcodescanner.Scanner)) return;
+            DispatchCommandResult(new WPCordovaClassLib.Cordova.PluginResult(WPCordovaClassLib.Cordova.PluginResult.Status.ERROR, "Not implemented"));
+        }
 
-            (Application.Current.RootVisual as PhoneApplicationFrame).Navigated -= root_Navigated;
+        private void OnFrameNavigationStoppedOrFailed(object sender, EventArgs e)
+        {
+            closeScanner();
+        }
 
-            barcodescanner.Scanner scanner = (barcodescanner.Scanner)e.Content;
 
-            if (scanner != null)
+        private void OnFrameNavigated(object sender, NavigationEventArgs e)
+        {
+
+            if (e.Content == _frameContentWhenOpened)
             {
-                scanner.Completed += new EventHandler<barcodescanner.ScannerResult>(scanner_Completed);
+                // Navigation to original page; close the scanner page
+                closeScanner();
+            }
+            else if (null == _scannerPage)
+            {
+                _scannerPage = e.Content as barcodescanner.Scanner;
+                if (null != _scannerPage)
+                {
+                    _scannerPage.Completed += new EventHandler<barcodescanner.ScannerResult>(scanner_Completed);
+                }
             }
         }
 
+        /// <summary>
+        /// Deattach events
+        /// </summary>
+        private void closeScanner()
+        {
+
+            // Unhook from events
+            if (null != _frame)
+            {
+                _frame.Navigated -= OnFrameNavigated;
+                _frame.NavigationStopped -= OnFrameNavigationStoppedOrFailed;
+                _frame.NavigationFailed -= OnFrameNavigationStoppedOrFailed;
+
+                _frame = null;
+                _frameContentWhenOpened = null;
+            }
+
+            if (null != _scannerPage){
+                _scannerPage = null;
+            }
+        }
+
+        /// <summary>
+        /// Callback with the scan result
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void scanner_Completed(object sender, barcodescanner.ScannerResult e)
         {
             string result;
@@ -57,10 +126,6 @@ namespace Cordova.Extension.Commands
 
             DispatchCommandResult(new WPCordovaClassLib.Cordova.PluginResult(WPCordovaClassLib.Cordova.PluginResult.Status.OK, "{" + result + "}"));
         }
-
-        public void encode(string options)
-        {
-            DispatchCommandResult(new WPCordovaClassLib.Cordova.PluginResult(WPCordovaClassLib.Cordova.PluginResult.Status.ERROR, "Not implemented"));
-        }
+        
     }
 }
