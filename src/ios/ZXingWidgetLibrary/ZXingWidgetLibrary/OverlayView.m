@@ -18,8 +18,6 @@
 
 #import "OverlayView.h"
 
-static const CGFloat kPadding = 10;
-static const CGFloat kLicenseButtonPadding = 10;
 static const int MIN_FRAME_WIDTH = 240;
 static const int MIN_FRAME_HEIGHT = 240;
 static const int MAX_FRAME_WIDTH = 1200; // = 5/8 * 1920
@@ -53,8 +51,8 @@ static const int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
         
         self.oneDMode = isOneDModeEnabled;
         
-        toolbar = [[UIToolbar alloc] init];
-        toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleTopMargin;
+        toolbar = [[UIToolbar alloc] initWithFrame: CGRectZero];
+        toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
         toolbar.barStyle = UIBarStyleBlackTranslucent;
         toolbar.translucent = YES;
         
@@ -79,7 +77,7 @@ static const int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
             [cancelButton release];
         }
         
-        toolbar.items = items;
+        [toolbar setItems:items animated:NO];
         
         [toolbar sizeToFit];
         CGFloat toolbarHeight  = [toolbar frame].size.height;
