@@ -15,7 +15,7 @@ committed with an updated jar.
 Note: the iOS source for this project includes a XCode Universal Static Library Project.
 _plugman_ currently doesn't support Library Project refs, so its been
 prebuilt as a fat library. Any updates to the Static Library Project should be
-committed with an updated library file (.a).
+committed with an updated library file (.a). This library is being using if the devices does not run iOS7, otherwise it uses the new API for scanning barcodes (AVCaptureMetaDataOutput).
 
 Note: the WP8 source does not include the ZXing.Net library, so it has to
 be included during installation.
