@@ -12,16 +12,26 @@
 
 @synthesize callbackId = _callbackId;
 
+- (UIViewController*) createScanner{
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0f) {
+        
+        CaptureBarcodesViewController *captureController = [[CaptureBarcodesViewController alloc] init];
+        captureController.delegate = self;
+        captureController.soundToPlay = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
+        return captureController;
+    }else{
+     
+        ZXingWidgetController *widgetController = [[ZXingWidgetController alloc] initWithDelegate:self showCancel:YES OneDMode:NO showLicense: NO];
+        widgetController.soundToPlay = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
+        return widgetController;
+    }
+}
 
 - (void)scan:(CDVInvokedUrlCommand*)command{
     
     self.callbackId = command.callbackId;
     
-    ZXingWidgetController *widgetController = [[ZXingWidgetController alloc] initWithDelegate:self showCancel:YES OneDMode:NO showLicense: NO];
-    
-    widgetController.soundToPlay = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-beep" ofType:@"aiff"] isDirectory:NO];
-    
-    [self.viewController presentModalViewController:widgetController animated:YES];
+    [self.viewController presentModalViewController:[self createScanner] animated:YES];
 }
 
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled{
@@ -71,6 +81,28 @@
 - (BOOL)zxingController:(ZXingWidgetController*)controller shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
  
     return [self.viewController shouldAutorotateToInterfaceOrientation: interfaceOrientation];
+}
+
+#pragma mark -
+#pragma mark CaptureDelegate
+
+- (void)captureController:(CaptureBarcodesViewController*)controller didScanResult:(NSString *)result format: (NSString*)format{
+    
+    controller.delegate = nil;
+    
+    [self.viewController dismissModalViewControllerAnimated: YES];
+    
+    [self returnSuccess:result format:format cancelled: NO];
+}
+
+- (void)captureControllerDidCancel:(CaptureBarcodesViewController*)controller{
+    [self.viewController dismissModalViewControllerAnimated: YES];
+    
+    [self returnSuccess:@"" format:@"" cancelled: YES];
+}
+
+- (BOOL)captureController:(CaptureBarcodesViewController*)controller shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation{
+     return [self.viewController shouldAutorotateToInterfaceOrientation: interfaceOrientation];
 }
 
 @end

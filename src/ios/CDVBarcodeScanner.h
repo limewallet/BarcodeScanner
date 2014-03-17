@@ -9,8 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <Cordova/CDVPlugin.h>
 #import "ZXingWidgetController.h"
+#import "CaptureBarcodesViewController.h"
 
-@interface CDVBarcodeScanner : CDVPlugin <ZXingDelegate>{
+@interface CDVBarcodeScanner : CDVPlugin <ZXingDelegate, CaptureBarcodesDelegate>{
 
 }
 
