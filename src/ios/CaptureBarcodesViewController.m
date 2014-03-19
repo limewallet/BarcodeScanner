@@ -258,6 +258,8 @@
     [_prevLayer layoutSublayers];
     _prevLayer.frame = self.view.bounds;
     
+    [_highlightView setNeedsDisplay];
+    
     [CATransaction commit];
     [super willAnimateRotationToInterfaceOrientation:orientation duration:duration];
 }
