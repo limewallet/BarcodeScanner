@@ -13,6 +13,8 @@
 - (void)startCapture;
 - (void)stopCapture;
 
+- (AVCaptureVideoOrientation) convertOrientation: (UIInterfaceOrientation) from;
+
 @property (nonatomic, strong) NSDate *lastDetectionDate;
 @property (nonatomic, assign) NSTimeInterval quietPeriodAfterMatch;
 
@@ -39,6 +41,24 @@
     
     beepSound = -1;
     self.quietPeriodAfterMatch = 2.0;
+}
+
+- (void)dealloc {
+    if (beepSound) {
+        AudioServicesDisposeSystemSoundID(beepSound);
+    }
+    
+    [self stopCapture];
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear: animated];
     
     _highlightView = [[CaptureOverlayView alloc] initWithFrame: self.view.bounds];
     _highlightView.delegate = self;
@@ -64,25 +84,12 @@
     _prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:_session];
     _prevLayer.frame = self.view.bounds;
     _prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    _prevLayer.connection.videoOrientation = [self convertOrientation: self.interfaceOrientation];
     [self.view.layer addSublayer:_prevLayer];
     
     [self.view bringSubviewToFront:_highlightView];
     
     [self startCapture];
-}
-
-- (void)dealloc {
-    if (beepSound) {
-        AudioServicesDisposeSystemSoundID(beepSound);
-    }
-    
-    [self stopCapture];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -185,6 +192,30 @@
 #pragma mark -
 #pragma mark UIViewController Rotate
 
+-(AVCaptureVideoOrientation) convertOrientation: (UIInterfaceOrientation) from{
+    
+    AVCaptureVideoOrientation newOrientation;
+    
+    switch (from) {
+        case UIInterfaceOrientationPortrait:
+            newOrientation = AVCaptureVideoOrientationPortrait;
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown:
+            newOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+            newOrientation = AVCaptureVideoOrientationLandscapeRight;
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+            newOrientation = AVCaptureVideoOrientationLandscapeLeft;
+            break;
+        default:
+            newOrientation = AVCaptureVideoOrientationPortrait;
+    }
+    
+    return newOrientation;
+}
+
 - (BOOL)shouldAutorotate
 {
     return YES;
@@ -223,7 +254,7 @@
 {
     [CATransaction begin];
     
-    _prevLayer.connection.videoOrientation = (AVCaptureVideoOrientation) orientation;
+    _prevLayer.connection.videoOrientation = [self convertOrientation: orientation];
     [_prevLayer layoutSublayers];
     _prevLayer.frame = self.view.bounds;
     

@@ -30,7 +30,7 @@ static const int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
         self.clipsToBounds = YES;
         
         UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame: CGRectZero];
-        toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+        toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
         toolbar.barStyle = UIBarStyleBlackTranslucent;
         toolbar.translucent = YES;
         
