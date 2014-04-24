@@ -96,6 +96,9 @@
 }
 
 - (void)captureControllerDidCancel:(CaptureBarcodesViewController*)controller{
+
+    controller.delegate = nil;
+
     [self.viewController dismissModalViewControllerAnimated: YES];
     
     [self returnSuccess:@"" format:@"" cancelled: YES];

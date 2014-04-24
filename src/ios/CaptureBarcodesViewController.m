@@ -92,6 +92,12 @@
     [self startCapture];
 }
 
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    
+    self.delegate = nil;
+}
+
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [_highlightView removeFromSuperview];
