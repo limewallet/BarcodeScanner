@@ -96,12 +96,13 @@
     [super viewWillDisappear:animated];
     
     self.delegate = nil;
+
+    [self stopCapture];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [_highlightView removeFromSuperview];
-    [self stopCapture];
 }
 
 #pragma mark - Cancel delegate
@@ -181,7 +182,6 @@
         [_highlightView reset];
         [_session startRunning];
     }
-    
 }
 
 - (void)stopCapture {
@@ -191,6 +191,7 @@
         [_timer invalidate];
         _timer = nil;
         [_session stopRunning];
+        _session = nil;
     }
 }
 
