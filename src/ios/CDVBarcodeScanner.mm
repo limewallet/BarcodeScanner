@@ -31,7 +31,9 @@
     
     self.callbackId = command.callbackId;
     
-    [self.viewController presentModalViewController:[self createScanner] animated:YES];
+    //[self.viewController presentModalViewController:[self createScanner] animated:YES];
+    
+    [self.viewController presentViewController:[self createScanner] animated:YES completion:nil];
 }
 
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled{
@@ -66,15 +68,16 @@
 
 - (void)zxingController:(ZXingWidgetController*)controller didScanResult:(NSString *)result format: (NSString*)format{
 
-    [self.viewController dismissModalViewControllerAnimated: YES];
-    
+//    [self.viewController dismissModalViewControllerAnimated: YES];
+    [self.viewController dismissViewControllerAnimated:YES completion:nil];
     [self returnSuccess:result format:format cancelled: NO];
 }
 
 - (void)zxingControllerDidCancel:(ZXingWidgetController*)controller{
     
-    [self.viewController dismissModalViewControllerAnimated: YES];
-    
+//    [self.viewController dismissModalViewControllerAnimated: YES];
+    [self.viewController dismissViewControllerAnimated:YES completion:nil];
+
     [self returnSuccess:@"" format:@"" cancelled: YES];
 }
 
@@ -90,8 +93,9 @@
     
     controller.delegate = nil;
     
-    [self.viewController dismissModalViewControllerAnimated: YES];
-    
+//    [self.viewController dismissModalViewControllerAnimated: YES];
+    [self.viewController dismissViewControllerAnimated:YES completion:nil];
+
     [self returnSuccess:result format:format cancelled: NO];
 }
 
@@ -99,8 +103,9 @@
 
     controller.delegate = nil;
 
-    [self.viewController dismissModalViewControllerAnimated: YES];
-    
+//    [self.viewController dismissModalViewControllerAnimated: YES];
+    [self.viewController dismissViewControllerAnimated:YES completion:nil];
+
     [self returnSuccess:@"" format:@"" cancelled: YES];
 }
 

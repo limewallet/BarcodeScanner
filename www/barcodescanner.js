@@ -1,3 +1,4 @@
+
 /**
  * cordova is available under *either* the terms of the modified BSD license *or* the
  * MIT License (2008). See http://opensource.org/licenses/alphabetical for full text.
@@ -66,5 +67,16 @@ BarcodeScanner.prototype.encode = function (type, data, successCallback, errorCa
         ]);
 };
 
-var barcodeScanner = new BarcodeScanner();
-module.exports = barcodeScanner;
+// var barcodeScanner = new BarcodeScanner();
+// module.exports = barcodeScanner;
+
+    BarcodeScanner.install = function () {
+    if (!window.plugins) {
+      window.plugins = {};
+    }
+    window.plugins.BarcodeScanner = new BarcodeScanner();
+    return window.plugins.BarcodeScanner;
+  };
+   
+  cordova.addConstructor(BarcodeScanner.install);
+
